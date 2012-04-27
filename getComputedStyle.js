@@ -1,15 +1,16 @@
 // getComputedStyle
 !('getComputedStyle' in this) && (this.getComputedStyle = (function () {
-	function getPixelSize(element, sizeWithSuffix, rootSize) {
+	function getPixelSize(element, style, property, fontSize) {
 		var
+		sizeWithSuffix = style[property],
 		size = parseFloat(sizeWithSuffix),
-		suffix = sizeWithSuffix.split(/\d/)[0];
+		suffix = sizeWithSuffix.split(/\d/)[0],
+		rootSize;
 
-		if (rootSize == null) {
-			rootSize = /em|%/.test(suffix) && element.parentElement ? getPixelSize(element.parentElement, element.parentElement.currentStyle.fontSize, null) : 16;
-		}
+		fontSize = fontSize != null ? fontSize : /%|em/.test(suffix) && element.parentElement ? getPixelSize(element.parentElement, element.parentElement.currentStyle, 'fontSize', null) : 16;
+		rootSize = property == 'fontSize' ? fontSize : /width/i.test(property) ? element.clientWidth : element.clientHeight;
 
-		return (suffix == 'em') ? size * rootSize : (suffix == 'in') ? size * 96 : (suffix == 'pt') ? size * 96 / 72 : (suffix == '%') ? size / 100 * rootSize : size;
+		return (suffix == 'em') ? size * fontSize : (suffix == 'in') ? size * 96 : (suffix == 'pt') ? size * 96 / 72 : (suffix == '%') ? size / 100 * rootSize : size;
 	}
 
 	function setShortStyleProperty(style, property) {
@@ -26,17 +27,19 @@
 		: [style[t], style[r], style[b], style[l]]).join(' ');
 	}
 
-	function getComputedStyle(element) {
+	function CSSStyleDeclaration(element) {
 		var
 		currentStyle = element.currentStyle,
-		style = {},
-		fontSize = getPixelSize(element, currentStyle.fontSize, null);
+		style = this,
+		fontSize = getPixelSize(element, currentStyle, 'fontSize', null);
+
+		console.log(['fontSize', fontSize]);
 
 		for (property in currentStyle) {
-			style[property] = currentStyle[property];
-
-			if (/(margin|padding)(Top|Right|Bottom|Left)|border(Top|Right|Bottom|Left)Width/.test(property)) {
-				style[property] = getPixelSize(element, style[property], fontSize) + 'px';
+			if (/width|height|margin.|padding.|border.+W/.test(property) && style[property] !== 'auto') {
+				style[property] = getPixelSize(element, currentStyle, property, fontSize) + 'px';
+			} else {
+				style[property] = currentStyle[property];
 			}
 		}
 
@@ -47,6 +50,20 @@
 		style.fontSize = fontSize + 'px';
 
 		return style;
+	}
+
+	CSSStyleDeclaration.prototype = {
+		constructor: CSSStyleDeclaration,
+		getPropertyPriority: function () {},
+		getPropertyValue: function () {},
+		item: function () {},
+		removeProperty: function () {},
+		setProperty: function () {},
+		getPropertyCSSValue: function () {}
+	};
+
+	function getComputedStyle(element) {
+		return new CSSStyleDeclaration(element);
 	}
 
 	return getComputedStyle;
