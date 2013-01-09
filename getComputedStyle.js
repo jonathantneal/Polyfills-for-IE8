@@ -33,8 +33,6 @@
 		style = this,
 		fontSize = getPixelSize(element, currentStyle, 'fontSize', null);
 
-		console.log(['fontSize', fontSize]);
-
 		for (property in currentStyle) {
 			if (/width|height|margin.|padding.|border.+W/.test(property) && style[property] !== 'auto') {
 				style[property] = getPixelSize(element, currentStyle, property, fontSize) + 'px';
