@@ -55,7 +55,9 @@
 	CSSStyleDeclaration.prototype = {
 		constructor: CSSStyleDeclaration,
 		getPropertyPriority: function () {},
-		getPropertyValue: function () {},
+		getPropertyValue: function ( prop ) {
+			return this[prop] || '';
+		},
 		item: function () {},
 		removeProperty: function () {},
 		setProperty: function () {},
