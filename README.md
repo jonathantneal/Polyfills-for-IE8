@@ -1,4 +1,4 @@
 Polyfills-for-IE8
 =================
 
-Make the best of a bad situation. Namely, IE8.
+Please move to https://github.com/jonathantneal/polyfill
