@@ -39,7 +39,11 @@
 			} else if (property === 'styleFloat') {
 				style['float'] = currentStyle[property];
 			} else {
-				style[property] = currentStyle[property];
+				try {
+					style[property] = currentStyle[property];
+				} catch(e) {
+					// Do nothing
+				}
 			}
 		}
 
